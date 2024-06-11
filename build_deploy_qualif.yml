@@ -1,0 +1,29 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.8'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'package'
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Azure for Students(1)(ae88eae1-c86b-421f-9718-17b152500d98)'
+    appType: 'webAppLinux'
+    appName: 'front-qualif-azure'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    runtimeStack: 'JAVA|17-java17'
